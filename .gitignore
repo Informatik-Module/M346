@@ -1,0 +1,12 @@
+# OpenTofu / Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# cloud-init
+user-data
+
+# Secrets
+*.pem
+.env
