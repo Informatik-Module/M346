@@ -1,0 +1,29 @@
+#cloud-config
+users:
+  - default
+  - name: jannick
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII+vthUFJjjjJ/dN42bAfECCzcncLUNwes8Hrp8qiAb5
+
+package_update: true
+package_upgrade: true
+packages:
+  - apache2
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+  - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
+    content: |
+      [mysqld]
+      bind-address = 0.0.0.0
+
+runcmd:
+  - systemctl reload ssh mariadb-server
+  - printf "\n[!] Einrichtung durch cloud-init abgeschlossen\n" >> /etc/motd

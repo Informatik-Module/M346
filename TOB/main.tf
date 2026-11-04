@@ -1,54 +1,19 @@
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-    }
-  }
+  required_providers { aws = { source = "hashicorp/aws" } }
 }
 
 provider "aws" {
-  region = "us-east-1"                  # Das Learner Lab läuft in us-east-1
+  region                   = "us-east-1"                # Learner Lab läuft auf us-east-1
+  shared_credentials_files = ["../../.aws_credentials"] # meine super geheimen login-daten shhhh~
 }
 
-resource "aws_security_group" "web_sg" {
-  name_prefix = "webserver-"         # AWS haengt eine Zufallszahl an
-  description = "HTTP und SSH fuer den Webserver"
-
-  ingress {                             # eingehend: HTTP für alle
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {                             # eingehend: SSH
-    from_port   = 22                    # 0.0.0.0/0 ist hier bewusst gewählt
-    to_port     = 22                  
-    protocol    = "tcp"                 # In einer echten Umgebung gehört hier die
-    cidr_blocks = ["0.0.0.0/0"]         # eigene IP mit /32 hin.
-  }
-
-  egress {                              # ausgehend: alles erlaubt
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_instance" "web" {
-  ami                         = "ami-0b6d9d3d33ba97d99" # Ubuntu 26.04
-  instance_type               = "t3.micro"
-  vpc_security_group_ids      = [aws_security_group.web_sg.id]
-  user_data                   = file("cloud-init.yaml")
-  user_data_replace_on_change = true
-
-
+resource "aws_vpc" "vpc-brunner" {
+  cidr_block           = "10.0.0.0/16" # cidr block
+  enable_dns_hostnames = true          # JA zu hostname-dns!
+  enable_dns_support   = true          # jetzt muss dns nur noch supportet sein: 
+  instance_tenancy     = "default"     # macht irgendwie, dass EC2 immer das nutzen? nicht ganz sicher;; https://search.opentofu.org/provider/hashicorp/aws/latest/docs/resources/vpc#attr-instance_tenancy
+  # ipv6_cidr_block      = "0"           # KEIN IPv6! Ewww (default)
   tags = {
-    Name = "SG-Tag3-Isabel"
+    "Name" = "VPC-Brunner"
   }
-}
-
-output "public_ip" {                    # Nach dem apply anzeigen
-  value = aws_instance.web.public_ip
 }
