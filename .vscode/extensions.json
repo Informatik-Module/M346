@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "opentofu.vscode-opentofu",
+    "redhat.vscode-yaml",
+    "hashicorp.terraform"
+  ]
+}
