@@ -1,0 +1,28 @@
+#cloud-config
+
+users:
+  - default   #Erstellt den Standarbenutzer (Ubuntu)
+
+  - name: mischa 
+    groups: sudo  #Fügt Mischa zur Sudo Gruppe hinzu für Adminrechte
+    sudo: ALL=(ALL) NOPASSWD:ALL   # mischa darf alle Befehle als root ohne Passwort ausführen
+    shell: /bin/bash  #Auswahl der Shell
+    ssh_authorized_keys:  #Autorisiertet öffentlicher SSH schlüssel hinzufügen damit sich der user anmelden kann (zusätzlich der von der Lehrperson)
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC77KcBT3dOv6vP74ys1naTAeq82bFAS3ImueImusbr4ZROCVGkpTZ/oH7KGw/kuMCSlvi0L3Ea1L/ccEKIDPfF+YGq8rwF/9I7cszVt3cdpReldw32uFAEu2qtHWPxpdZ8IOiylyQ845Pr0hvbLTAkREhrvMHejnNH7P8ztIGjHEzlPDGOz5GoHLhhUNCqQ2AcS/jvMQRx/TycSehZuhHjmizqqFiGDwN9nuzmCXs4jZqw0dFxln1CaSkwdVERMKxo9a2hy/OMClJI513TmmWdchm89vinUXmcZtZZFQ42QaGfxrtilyfqSfAr8ms+NXqWwatdlQUxVu/G0yfMVyy3
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+
+packages: #Package installieren und updaten
+  - netcat-openbsd
+package_update: true
+package_upgrade: true
+
+write_files: 
+  - path: /etc/ssh/sshd_config.d/10-m346_hardening.conf  #pfad der datei, "10-" im Namen, damit die Datei vor 50-cloud-init.conf gelesen wird
+    content: |  #inhalt wird genau so übernommen wie hier geschrieben (zeilenumbrücher / Leerzeilen etc.). Hardening wird vorgenommen, kein root login, keine passwort authentifizierung und kein interaktives login
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+
+runcmd: #reload, damit die neue config ausgelesen wird und ein log file
+  - systemctl reload ssh
+  - touch /var/log/setup-done
