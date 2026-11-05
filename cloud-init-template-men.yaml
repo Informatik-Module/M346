@@ -1,0 +1,30 @@
+#cloud-config
+package_update: true #von aufgabe
+
+users:    #Um Users zu erstellen
+ - default    #Erstellung ubuntu default users
+
+ - name: fynn   #User mit meinem Namen wird erstellt
+   groups: sudo   #Fügt in zu der 'Admingruppe' hinzu
+   sudo: ALL=(ALL) NOPASSWD:ALL   #Benutzer Sudo darf auf allen hosts Befehle als jeder User ausführen, dies ohne PW und alle Befehle
+   shell: /bin/bash #SHell Auswahl
+   ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDl9YDRq1wLYjA4jqcMbZB2z1VSy01SxHCWBy8z/7aFCvynZr0yUFCeAug9XrOWxJEClJ2jRQXKfDr1rEa7bUJxsH+VgJLJVYZny64zoHwg6oxAypwjE9Ezl1nDCyxbaXK4Ml6ZjXLFRYIEijo6RgnQMM6HR0RTj1gKVGF0y2ZHfslDq+lIAjElDGQN9g2CrscTcFIZO8+lQ074Z+uWk3MbIZtlhqqtd7N8FAWlBhlnjbTW3GP6TFkoM7ltSgXPS12F1BmiS5nq2xbQIfYjAgli5T/e5m6VVGwMhKcD9Km9mS6juSM2hlzjml5ZQjaXQ8D8f5Ob0wniNjyPxpgfJpif
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+
+packages:
+ - nginx #apache2 für Webserver
+ - fail2ban # nach mehreren fehlgeschlagenen anmeldevaersuchen wird die ip adress blockiert
+ - netcat-openbsd #von aufgabe
+
+write_files:
+ - path: /etc/ssh/sshd_config.d/tag2-tst.conf #Pfad wo eine file erstellt wird
+   content: |   #heisst das ein mehrzeiliger text in die datei geschrieben wird
+     PermitRootLogin no
+     PasswordAuthentication no
+     KbdInteractiveAuthentication no
+#root nicht direkt verbinden | pw anmeldung deactivated | keine interaktive ssh auth
+
+runcmd:   #führt befehl aus
+ - systemctl reload ssh   #lädt die shh konfiguration neu
+ - touch /var/log/setup-done    #erstellt die datei 'setup-done'
