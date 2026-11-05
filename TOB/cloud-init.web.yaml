@@ -19,11 +19,11 @@ write_files:
       PermitRootLogin no
       PasswordAuthentication no
       KbdInteractiveAuthentication no
-  - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
-    content: |
-      [mysqld]
-      bind-address = 0.0.0.0
 
 runcmd:
-  - systemctl reload ssh mariadb-server
-  - printf "\n[!] Einrichtung durch cloud-init abgeschlossen\n" >> /etc/motd
+  - systemctl reload ssh apache2
+  - |
+    printf "
+    ----------------------------------------------\n
+    [!] Einrichtung durch cloud-init abgeschlossen\n
+    " >> /etc/motd

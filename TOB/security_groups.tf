@@ -1,4 +1,5 @@
 resource "aws_security_group" "web_sg" {
+  vpc_id      = aws_vpc.vpc-brunner.id            # VPC auch hier angeben sonst geht es nicht mit subnets
   name_prefix = "sg_webserver-"                   # AWS hängt eine Zufallszahl an
   description = "HTTP und SSH fuer den Webserver" # desc
   ingress {                                       # eingehend HTTP erlauben
@@ -22,6 +23,7 @@ resource "aws_security_group" "web_sg" {
 }
 
 resource "aws_security_group" "db_sg" {
+  vpc_id      = aws_vpc.vpc-brunner.id               # VPC auch hier angeben sonst geht es nicht mit subnets
   name_prefix = "sg_database-"                       # AWS hängt eine Zufallszahl an
   description = "DB und SSH intern fuer Database"    # desc
   ingress {                                          # eingehend Database erlauben aber nur von webserver

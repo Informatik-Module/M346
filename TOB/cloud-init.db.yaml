@@ -6,7 +6,7 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII+vthUFJjjjJ/dN42bAfECCzcncLUNwes8Hrp8qiAb5
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII+vthUFJjjjJ/dN42bAfECCzcncLUNwes8Hrp8qiAb5 # lokaler key auf meinem laptop
 
 package_update: true
 package_upgrade: true
@@ -25,5 +25,13 @@ write_files:
       bind-address = 0.0.0.0
 
 runcmd:
-  - systemctl reload ssh mariadb-server
-  - printf "\n[!] Einrichtung durch cloud-init abgeschlossen\n" >> /etc/motd
+  - systemctl reload ssh
+  - systemctl enable --now mariadb
+  - systemctl restart mariadb
+  - mariadb -e "CREATE DATABASE IF NOT EXISTS modul346;"
+  - mariadb -e "CREATE USER IF NOT EXISTS 'jannick'@'%' IDENTIFIED BY 'Passwort123.';"
+  - mariadb -e "GRANT ALL PRIVILEGES ON modul346.* TO 'jannick'@'%';"
+  - |-
+    printf "----------------------------------------------\n
+    [!] Einrichtung durch cloud-init abgeschlossen\n
+    [*] Teste mit 'mariadb -h $(hostname -i) -u jannick -pPasswort123. modul346'\n" >> /etc/motd

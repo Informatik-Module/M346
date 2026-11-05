@@ -1,3 +1,4 @@
+# /usr/bin/tofu apply -auto-approve -show-sensitive -compact-warnings
 terraform {
   required_providers { aws = { source = "hashicorp/aws" } }
 }
