@@ -1,4 +1,5 @@
 # OpenTofu / Terraform
+.terraform.lock.hcl
 .terraform/
 *.tfstate
 *.tfstate.*
@@ -10,3 +11,6 @@ user-data
 # Secrets
 *.pem
 .env
+
+# AWS Credentials
+.aws_credentials
