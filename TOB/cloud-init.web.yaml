@@ -1,0 +1,33 @@
+#cloud-config
+users:
+  - default
+  - name: jannick
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII+vthUFJjjjJ/dN42bAfECCzcncLUNwes8Hrp8qiAb5
+
+package_update: true
+package_upgrade: true
+packages:
+  - apache2
+
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <html lang="en"><body><h1>HALLO</h1><p>Das ist die neue Standartseite durch cloud-init</p>/body></html>
+
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+
+runcmd:
+  - systemctl reload ssh apache2
+  - |
+    printf "
+    ----------------------------------------------\n
+    [!] Einrichtung durch cloud-init abgeschlossen\n
+    " >> /etc/motd
