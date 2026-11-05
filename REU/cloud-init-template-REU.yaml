@@ -1,0 +1,51 @@
+#cloud-config
+# Pflichtzeile: cloud-init erkennt die Datei nur damit
+
+users:
+  # Standardbenutzer (ubuntu) behalten
+  - default
+  # Neuer Benutzer mit eigenem Namen
+  - name: yuma
+    # Gruppe sudo = Admin-Rechte
+    groups: sudo
+    # sudo ohne Passwort
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    # Standard-Shell
+    shell: /bin/bash
+    # Public Key von mir
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDeR6fFqSVhVVhgt3TPIGhmuhFKnCTGlfs8qbZESXcKJGRXqUP4i54bbyGsCeL4Ahixi++uR87aWr5F33JNNVOzguXMSHxT34bYK01Dy9BoI1d3G09U0AeJUhMAvJvK/cfBTTszZmlnQQCLcU553e2wjg6nIhtnW1F2AkZA5knKQjl+YX2yYrn2tKTE4tNkdtf/8B3Jo1FOEByG7vW+SyMcSR0oVqvPNp/vxAzImWUwwu1PP258nraBMMZY8CcsY3lPKhI2PeYPXdH1GPDExXrovOpEusid/eUXxyBopGMHCkk8ykFcXUMWgkuhXWsme7+YFBhyAPaTWD6gC9REQSZd Yuma
+
+  # User für Frau Geissmann
+  - name: geissmann
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    # Public Key von Frau Geissmann
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+
+# Zusätzliches Paket: Apache-Webserver
+packages:
+  - apache2
+# Vor der Installation apt update ausführen
+package_update: true
+# Danach alle Pakete aktualisieren
+package_upgrade: true
+
+write_files:
+  # SSH-Härtung als eigene Konfigurationsdatei
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+    # PermitRootLogin no: Root darf sich nicht per SSH anmelden.
+    # PasswordAuthentication no: Nur Schlüssel, kein Passwort.
+    # KbdInteractiveAuthentication no: Keine interaktive Anmeldung per Tastatur-Abfrage.
+
+runcmd:
+  # SSH neu starten, damit die Härtung aktiv wird
+  - systemctl restart ssh
+  # Nachweis: Logdatei mit Datum, Prüfen mit: cat /var/log/m346.log
+  - echo "Einrichtung durch cloud-init abgeschlossen am $(date)" > /var/log/m346.log
