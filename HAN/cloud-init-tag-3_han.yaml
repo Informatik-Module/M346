@@ -1,0 +1,28 @@
+#cloud-config
+---
+#Nutzer erstellen
+users:
+  - name: chantalhann
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnqp6fKPMZWN3SMz+hesE31vimy8vfFidROfvh3SwaINBAtrcEwYNozZWthu4LNK4G+YgdbyiNZF4RPeEuBHTZZtfYniKV7TGjlV8zmxUf88fRMQuHseRRad7ulT9IuIrP7rjSP+PuCYMMjL0RxGTMGlpsBGWF/TavuzEXeo6NogcCgOAYHImaCdqpFSqARLkR+Ugb0oZP5lN0FaabjcuIMpr+9o7Uhws4ftO7K+CSuxxA8qKuyg7hTjK5hdZboVuGvlly5kbgO6UOJXWLSk2uFL8r7IdKoYOvp4CGv9Ompe0+LGsD9R0uB6Az2BzbXM23HlwO+FQsRfBdfvOA3S0X
+
+#Pakete aktualisieren und installieren
+packages:
+  - apache2
+package_update: true
+package_upgrade: true
+
+#SSH abhärten
+write_files:
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+
+#Befehle ausführen
+runcmd:
+  - echo "Einrichtung durch cloud-init abgeschlossen" > /var/log/m346.log
