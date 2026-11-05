@@ -1,0 +1,39 @@
+#cloud-config
+# Brunner-DB: Datenbank im Subnetz-Private
+
+# Benutzer
+# default = ubuntu bleibt (ohne Key Pair kein Login moeglich)
+users:
+  - default
+  - name: simon
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      # mein Key
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvzDDnC1ja/a2eQVI3kDP9f4rnL8y7UAHLQdfyeh2IIn58AwRtp8D70U6lIapel2UCc83dLEvCNsuUEKFpW/gCa1Tm5iX0gs9TIDa3GyY2uD3MqvQtkzKZMwTBSs0mFK1V22PzkCbMgeerrAsvrvGPid59dDYLByZeW0+VGrV6IfcEGwlItX0063tZXjBxsR86Rf2K5HGwn/07J6s9zE0JdsSe1hUFokFKBpx/98cU4O94yCaMlrVwq/jSqN8GnfPJKkxxqxrJssl6ECBe1zw8TzW4dBrpfR1k+QGiYvCKjTRpvRm2BjxxFzFNGr8JaDzr5yaYWVsKas1vo2LXJljD
+      # Key Lehrer
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+
+# SSH: kein root, kein Passwort
+disable_root: true
+ssh_pwauth: false
+write_files:
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+  # MariaDB auf allen Adressen hoeren lassen, nicht nur localhost
+  # (wer wirklich rein darf, regelt SG-DB)
+  - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
+    content: |
+      [mysqld]
+      bind-address = 0.0.0.0
+
+# Pakete updaten und installieren (geht nur ueber das NAT-Gateway)
+package_update: true
+package_upgrade: true
+packages:
+  - netcat-openbsd
+  - mariadb-server # Datenbank
