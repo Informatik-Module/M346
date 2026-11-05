@@ -1,0 +1,51 @@
+#cloud-config
+# Damit cloud-init die Datei erkennt. Muss vorhanden sein!
+ 
+users:
+  - default
+  - name: Reto
+    # Neuer Benutzer
+    groups: sudo
+    # Benutzer kommt in die Gruppe sudo(admins)
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    # Darf alle Befehle ohne Passwort mit sudo ausführen
+    shell: /bin/bash
+    # Standard-Shell
+    ssh_authorized_keys:
+      - ssh-rsa ***
+      # Public Key für die SSH-Anmeldung (landet in authorized_keys)
+  - name: Lehrer 
+
+    groups: sudo
+
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+    shell: /bin/bash
+
+    ssh_authorized_keys:
+    - ***
+ 
+packages:
+  - apache2
+  # Installiert den Apache-Webserver
+package_update: true
+# Führt zuerst apt update aus
+package_upgrade: true
+# Führt danach apt upgrade aus
+ 
+write_files:
+  # Legt eine zusätzliche SSH-Konfigurationsdatei an
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+ 
+# PermitRootLogin no: Root darf sich nicht per SSH anmelden.
+# PasswordAuthentication no: Nur Schlüssel, kein Passwort.
+# KbdInteractiveAuthentication no: Keine interaktive Anmeldung per Tastatur-Abfrage.
+ 
+runcmd:
+  - echo "Einrichtung durch cloud-init abgeschlossen" > /var/log/m346.log
+  # Schreibt eine Meldung in eine Logdatei
+ 
