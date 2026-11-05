@@ -1,0 +1,48 @@
+#cloud-config
+users:
+  - default
+  - name: Daris
+    # Neuer Benutzer
+    groups: sudo
+    # Benutzer kommt in die Gruppe sudo(admins)
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    # Darf alle Befehle ohne Passwort mit sudo ausführen
+    shell: /bin/bash
+    # Standard-Shell
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsLBgg7y70Bv/52WZ1uzLRcPZBGJLHoI90V/4OfDoTW6w10xmuUvKOXeymFQdLX2YZByhCaUpYSirrrXM1MBsfni3t+hIJEoM+lpHagvaWtA7H2PQXsYPk3xkcsKgn2NTeMQyUPji8fLE5EJBjyjn0SLgpBvsZ0CbADf79/qQJI1kyqoi0yhb/6zfz8Vc11jrtaczAa9VGwif5VfTNkFsNgyhdYLe100XgMsJL/Rl1mZcvoMWX5WdwFnfpByoEHWvL0xg0naOzsIAXazoxHh0JwTu3+iNpGpkekVpyqee+H4Z9onk6jFeDHJ385srcV85UQTCn62eQDh6T50FvGXbx daris2
+      # Public Key für die SSH-Anmeldung (landet in authorized_keys)
+  - name: Geissmann
+    # Neuer Benutzer für Frau Geissmann
+    groups: sudo
+    # Benutzer kommt in die Gruppe sudo(admins)
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    # Darf alle Befehle ohne Passwort mit sudo ausführen
+    shell: /bin/bash
+    # Standard-Shell
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+    # Public Key von Frau Geissmann
+packages:
+  - apache2
+  -
+  # Installiert den Apache-Webserver
+package_update: true
+# Führt zuerst apt update aus
+package_upgrade: true
+# Führt danach apt upgrade aus
+
+write_files:
+  # Legt eine zusätzliche SSH-Konfigurationsdatei an
+  - path: /etc/ssh/sshd_config.d/01-m346-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+    # PermitRootLogin no: Root darf sich nicht per SSH anmelden.
+    # PasswordAuthentication no: Nur Schlüssel, kein Passwort.
+    # KbdInteractiveAuthentication no: Keine interaktive Anmeldung per Tastatur-Abfrage.
+
+runcmd:
+  - echo "Einrichtung durch cloud-init abgeschlossen" > /var/log/m346.log
+  # Schreibt eine Meldung in eine Logdatei
