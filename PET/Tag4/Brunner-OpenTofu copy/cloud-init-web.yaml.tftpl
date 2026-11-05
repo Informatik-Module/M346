@@ -1,0 +1,38 @@
+#cloud-config
+# Example SSH setup: replace/merge with your OWN personal cloud-init template if required.
+# Refresh package indexes before installing the web server package.
+package_update: true
+packages:
+  # Apache serves HTTP requests on the web instance.
+  - apache2
+
+# Keep the default OS user and create the SSH-enabled Brunner administrator.
+users:
+  - default
+  - name: brunner
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyZQupD9kYDE5Ddk3T75qv6+/cWf5hhGCDdpaVoiVl9BZIayxiLvA8tA+bp2mF5ZVitnDMskvvkd1fBCYrql+dzktQ0uDmHKv6OZgKSVRJjKRf0bfYX6W1KyIglq9ZPNq5rV8I9UpBZALfIfAaAvtKB2mw4n+EHKCWcJh/oV4jFgjNEqokhIveIAAHqxvgRzEOCLNQDGd7k7GFg9URmWZBLiNCZziO7AfuOrAImZpNwTS9QczmEQjtnJMrwQkBhPtMteqS5fiHJpg5KFT63Xu2rSV8zwCyicn6SNxUgJ3CZNEpreHbyRBd0gw7pugK4WYLq8p1lgQaAGAiJNs5s0Al # Adam's SSH public key.
+
+# Require SSH keys, disable password-based SSH, and prevent root SSH login.
+ssh_pwauth: false
+disable_root: true
+
+# Harden the SSH daemon with key-only access.
+write_files:
+  - path: /etc/ssh/sshd_config.d/99-brunner-hardening.conf
+    owner: root:root
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin no
+      KbdInteractiveAuthentication no
+
+# Start Apache at boot, reload SSH to apply hardening, and record setup status.
+runcmd:
+  - [systemctl, enable, --now, apache2]
+  - [systemctl, reload, ssh]
+  - echo, "Einrichtung durch cloud-init abgeschlossen", >, /var/log/m346.log

@@ -1,0 +1,44 @@
+#cloud-config
+# Define the default account and additional SSH-enabled administrators.
+users: # Configure the accounts that cloud-init should create.
+  - default # Keep the distribution's default user.
+
+  - name: Adam # Create the Adam account.
+    groups: sudo # Add Adam to the sudo group.
+    sudo: ALL=(ALL) NOPASSWD:ALL # Allow Adam to run sudo commands without a password.
+    shell: /bin/bash # Use Bash as Adam's login shell.
+    ssh_authorized_keys: # Install public keys permitted to log in to Adam over SSH.
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyZQupD9kYDE5Ddk3T75qv6+/cWf5hhGCDdpaVoiVl9BZIayxiLvA8tA+bp2mF5ZVitnDMskvvkd1fBCYrql+dzktQ0uDmHKv6OZgKSVRJjKRf0bfYX6W1KyIglq9ZPNq5rV8I9UpBZALfIfAaAvtKB2mw4n+EHKCWcJh/oV4jFgjNEqokhIveIAAHqxvgRzEOCLNQDGd7k7GFg9URmWZBLiNCZziO7AfuOrAImZpNwTS9QczmEQjtnJMrwQkBhPtMteqS5fiHJpg5KFT63Xu2rSV8zwCyicn6SNxUgJ3CZNEpreHbyRBd0gw7pugK4WYLq8p1lgQaAGAiJNs5s0Al # Adam's SSH public key.
+  - name: IG # Create the IG account.
+    groups: sudo # Add IG to the sudo group.
+    sudo: ALL=(ALL) NOPASSWD:ALL # Allow IG to run sudo commands without a password.
+    shell: /bin/bash # Use Bash as IG's login shell.
+    ssh_authorized_keys: # Install public keys permitted to log in to IG over SSH.
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT # IG's SSH public key.
+
+# Install MariaDB after refreshing and upgrading the package index.
+packages: # Packages that cloud-init should install.
+  - mariadb-server # Install the MariaDB database server.
+package_update: true # Refresh the package index before installing packages.
+package_upgrade: true # Upgrade installed packages during initialization.
+
+# Write MariaDB's network-listener configuration.
+write_files: # Create or update files on the instance.
+    - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
+      owner: root:root
+      permissions: '0644'
+      content: |
+      [mysqld]
+      bind-address = 0.0.0.0
+
+    - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
+      owner: root:root
+      permissions: '0644'
+      content: |
+      [mysqld]
+      bind-address = 0.0.0.0
+# Start MariaDB and record a marker when cloud-init setup finishes.
+runcmd: # Commands to execute after the instance has booted.
+  - systemctl enable mariadb
+  - systemctl restart mariadb
+  - echo "Einrichtung durch cloud-init abgeschlossen" > /var/log/m346.log # Record completion of the cloud-init setup.

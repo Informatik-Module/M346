@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars and replace with YOUR public key (one line).
+# NEVER insert your private key here.
+# Supply the key cloud-init will install for SSH login.
+ssh_public_key = "ssh-ed25519 AAAA_REPLACE_WITH_YOUR_PUBLIC_KEY user@computer"
+
+# Classroom exercise; for production use your personal public IP/32.
+# This CIDR controls SSH access to the web server, not the database server.
+web_ssh_cidr = "0.0.0.0/0"
