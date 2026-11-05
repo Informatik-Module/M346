@@ -1,0 +1,31 @@
+#cloud-config
+users:
+  #default user plus key2
+  - default
+    #mein user plus mein key1
+  - name: nick
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGqzjxfvWfK6/kdxbOACd0oTgqnTFhovr8JKrsxy8pf46hzbQLUQecFeOnmG65PWZKbCpsWDUdEkzzk8jOY+19G6Qh7jRtRdGMHdBrODZ6qo4okWyxZ9PtEVBxe/4n477Qk0zrnY90kt+QiE3udue+fwAgJU+rbhMwPfKXMcvP7lcGm/Mcdep1yCF7yxXiP4dCVuoHc/SWfcIbcQCfZyhO7f8+exuucx9XIWVcG5uaAYjnf3egUkzCP/B28XNYM8imt/j3Gw+U42OZHFrClgdocC9DR4kiJIjDait1OffxkoT1c+BGCG4M8HcCPrS8AVGRyqcJ/J/4/Uec4kdsF6jT
+    #Geissmann user plus ihr key
+  - name: geissmann
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV+rhsbhUN6pLbUFDasUpLAgx6qB1AdKpP5Gpn0JfbOCc3y46Bu8e72DFi95i2yqInfAAP5VZTdlQjTUAYTi3GfsDoAGbO5Iui14bdxAGzDjpXYtK0TwIh0Hmlh2fzB/lljpwc7MpNhFtDmfHaXsbYrREtCOihBMfkcxezBWmH8C5EUlRF7FuzyF7hdHtDcuCdNoaNsZirCq4+ns73FV0SGI9fTn15d8JuePXxP4rLNdusAdOIldErdY1mxMNZg+f6TTKvHNAa1fnH8tkK7J4+pBrVncN/IRpGapXZosnntvsEu9KF5AYhisi2WVhhhwmCx138cxl3hoXaseBPzFhT
+
+#herunterladen der Pakete
+packages:
+  - mariadb-server
+#files erstellen
+write_files:
+  - path: /etc/mysql/mariadb.conf.d/99-m346.cnf
+    content: |
+      [mysqld]
+      bind-address = 0.0.0.0
+#ausführen von CMD befehlen
+runcmd:
+  - echo "Alles hat funktioniert"
